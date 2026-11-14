@@ -1,0 +1,29 @@
+name: Build Linux Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+  # GitHub'in en hizli ve guclu bulut sunucusunu kullaniyoruz
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    - name: Set up build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev bc git
+
+    - name: Download Linux Kernel Source
+      run: |
+        git clone --depth=1 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git kernel-source
+
+    - name: Compile Kernel (Default Config)
+      run: |
+        cd kernel-source
+        make defconfig
+        make -j$(nproc)
+        
